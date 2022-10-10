@@ -3,7 +3,6 @@ import tweepy
 import typing
 import re
 from pathlib import Path
-import pypandoc
 from dataclasses import dataclass
 
 @dataclass

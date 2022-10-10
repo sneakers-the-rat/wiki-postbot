@@ -106,7 +106,7 @@ class WikiPostBot(tweepy.StreamingClient):
         # self.reply_completed(response, depo)
 
 
-    def reply_completed(self, response: tweepy.Response, deposit:Deposition):
+    def reply_completed(self, response: tweepy.Response, deposit):
 
         self.client.create_tweet(text=f"The preprint of your thread is ready: {deposit.doi_url} - {deposit.title}",
                             in_reply_to_tweet_id=response.data.id)

@@ -1,0 +1,1 @@
+from wiki_postbot.interfaces.interface import Interface

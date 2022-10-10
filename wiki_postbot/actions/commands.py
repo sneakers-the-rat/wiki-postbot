@@ -18,7 +18,10 @@ class Command_Params:
 
 class Command(Action):
     """
-    An action invoked by tweeting at the bot and telling it to do something
+    An action invoked by tweeting at the bot and telling it to do something.
+
+    Actions are usually not embedded within othter text, but exist as their own messages,
+    as opposed to :class:`.Inline` actions
     """
     name:str
     command_str = r"@(?P<username>\S{1,})\s*(?P<command>\w*)"
