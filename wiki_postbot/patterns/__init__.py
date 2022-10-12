@@ -1,0 +1,1 @@
+from wiki_postbot.patterns.patterns import Pattern

@@ -1,5 +1,5 @@
 from wiki_postbot.actions.action import Action, Result
-from wiki_postbot.patterns import WIKILINK
+from wiki_postbot.patterns.wikilink import WIKILINK
 from tweepy import Response
 import re
 
