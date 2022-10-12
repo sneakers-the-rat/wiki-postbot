@@ -32,3 +32,12 @@ class Zenodo_Creds:
             creds = json.load(jfile)
         return Zenodo_Creds(**creds)
 
+@dataclass
+class Discord_Creds:
+    token:str
+
+    @classmethod
+    def from_json(cls, path:Path) -> 'Discord_Creds':
+        with open(path, 'r') as jfile:
+            creds = json.load(jfile)
+        return Discord_Creds(**creds)

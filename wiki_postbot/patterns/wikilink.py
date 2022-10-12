@@ -1,8 +1,9 @@
 import re
-from wiki_postbot.patterns import Pattern
+from wiki_postbot.patterns.patterns import Pattern
 from dataclasses import dataclass
 from typing import Optional, Union, List
 import pyparsing as pp
+from pprint import pformat
 
 
 WIKILINK = re.compile(r'\[\[(.*?)\]\]', re.IGNORECASE)
@@ -73,6 +74,9 @@ class NBack:
     def __eq__(self, other:'NBack'):
         return all([getattr(self, f) == getattr(other, f) for f in self.FIELDS])
 
+    def __repr__(self) -> str:
+        return pformat({f:getattr(self, f) for f in self.FIELDS})
+
 class Wikilink(Pattern):
     """
     Pattern for detecting wikilinks!
@@ -84,7 +88,7 @@ class Wikilink(Pattern):
 
     In each of the following examples, `LINK` is a placeholder for the text of the wikilink to be made.
 
-    # N-Back Links
+    # N-Back Links (see :class:`.NBack`)
 
     For all of these, whitespace in-between the n-back specifier and the link text will be ignored. So
     `[[^LINK]]` and `[[^ LINK]]` are both valid.
@@ -170,6 +174,9 @@ class Wikilink(Pattern):
 
     def __eq__(self, other:'Wikilink'):
         return all(getattr(self, f) == getattr(other, f) for f in self.FIELDS)
+
+    def __repr__(self) -> str:
+        return pformat({f:getattr(self, f) for f in self.FIELDS if getattr(self, f) is not None})
 
 
 
