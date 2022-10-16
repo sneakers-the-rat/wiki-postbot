@@ -41,3 +41,15 @@ class Discord_Creds:
         with open(path, 'r') as jfile:
             creds = json.load(jfile)
         return Discord_Creds(**creds)
+
+
+@dataclass
+class Mediawiki_Creds:
+    user:str
+    password:str
+
+    @classmethod
+    def from_json(cls, path:Path) -> 'Mediawiki_Creds':
+        with open(path, 'r') as jfile:
+            creds = json.load(jfile)
+        return Mediawiki_Creds(**creds)
