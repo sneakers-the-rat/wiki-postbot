@@ -139,6 +139,9 @@ class Wikilink(Pattern):
         elif isinstance(nback, pp.ParseResults):
             nback = NBack(**dict(nback))
 
+        if isinstance(section, pp.ParseResults):
+            section = section[0]
+
         self.nback = nback
         self.predicate = predicate
         self.object = object
@@ -159,8 +162,12 @@ class Wikilink(Pattern):
         # main wikilink subject text
         link = pp.Word(pp.printables+ " ", excludeChars="#[]{}|")
 
+        # optional page section
+        hash = pp.Literal("#").suppress()
+        section = hash + link
+
         # Combine all
-        parser = lbracket + pp.Optional(nback) + link("link") + rbracket
+        parser = lbracket + pp.Optional(nback) + link("link") + pp.Optional(section("section")) + rbracket
         return parser
 
     @classmethod

@@ -37,6 +37,10 @@ class TestStr:
         "[[^{3}Link]]",
         Wikilink("Link", nback=NBack(end=3))
     )
+    section = (
+        "[[^{1,3}Link#With section]]",
+        Wikilink("Link", nback=NBack(1,3), section="With section")
+    )
 
 
 def pad_garbage(string:str) -> str:
@@ -120,6 +124,17 @@ def test_nback_range_end(test_string, expected):
     # pdb.set_trace()
     assert len(wl) == 1
     assert wl[0] == expected
+
+@pytest.mark.parametrize(
+    "test_string,expected",
+     [TestStr.section])
+def test_section(test_string, expected):
+    test_string = pad_garbage(test_string)
+    wl = Wikilink.parse(test_string)
+    # pdb.set_trace()
+    assert len(wl) == 1
+    assert wl[0] == expected
+
 
 def test_triplet_full():
     pass
