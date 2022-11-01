@@ -48,10 +48,15 @@ class Service:
         service = SERVICE_TEMPLATE.format(
             **asdict(self)
         )
-        with open('/etc/systemd/system/wikibot.service', 'w') as sfile:
-            sfile.write(service)
+        try:
+            with open('/etc/systemd/system/wikibot.service', 'w') as sfile:
+                sfile.write(service)
+            print('System file created, you should now enable it with \nsystemctl enable wikibot\nand start it with\nsystemctl start wikibot')
 
-        print('System file created, you should now enable it with \nsystemctl enable wikibot\nand start it with\nsystemctl start wikibot')
+        except PermissionError:
+            print('Could not write to system file, copy the following service file to /etc/systemd/system/wikibot.service')
+            print(service)
+
 
 def main():
     parser = argparser()
