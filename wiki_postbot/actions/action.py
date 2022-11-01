@@ -1,7 +1,6 @@
-import sys
-from abc import ABC, abstractmethod
+from abc import ABC
 import typing
-from typing import Optional, Union, Tuple, List, Dict
+from typing import Optional
 from dataclasses import dataclass
 
 from tweepy import Response

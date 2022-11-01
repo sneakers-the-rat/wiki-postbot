@@ -10,7 +10,7 @@ def init_logger(
         name:Optional[str]=None,
         basedir:Optional[Path]=None,
         loglevel:str='DEBUG',
-        loglevel_disk:Optional[str]=None
+        loglevel_disk:Optional[str]='DEBUG'
         ):
     if name is None:
         name = 'wiki_postbot'

@@ -10,6 +10,8 @@ packages = [
 
 [tool.poetry.scripts]
 wikipostbot = "wiki_postbot.main:main"
+discord_bot = "wiki_postbot.clients.discord_client:main"
+install_discord_bot = "wiki_postbot.service:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -20,6 +22,7 @@ pywikibot = "^7.7.0"
 pyparsing = "^3.0.9"
 "discord.py" = "^2.0.1"
 wikitextparser = "^0.51.1"
+certifi = "^2022.9.24"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

@@ -1,7 +1,8 @@
 """
 Class for interfacing with mediawiki
 """
-from typing import List
+from typing import List, Optional
+from pathlib import Path
 from urllib.parse import urljoin
 from dataclasses import dataclass
 from wiki_postbot.creds import Mediawiki_Creds
@@ -9,6 +10,7 @@ from wiki_postbot.formats.wiki import WikiPage
 from wiki_postbot.templates.wiki import TemplateMessage
 from wiki_postbot.patterns.wikilink import Wikilink
 from wiki_postbot.actions import Result
+from wiki_postbot.logger import init_logger
 from datetime import datetime
 import requests
 from discord.message import Message, Embed
@@ -18,11 +20,13 @@ import pdb
 
 
 class Wiki:
-    def __init__(self, url:str, api_suffix:str="/api.php", index_page="Discord Messages"):
+    def __init__(self, url:str, api_suffix:str="/api.php", index_page="Discord Messages",
+                 log_dir:Path=Path('/var/www/wikibot')):
         self.url = url
         self.api_url = urljoin(self.url, api_suffix)
         self.sess = None
         self.index_page = index_page
+        self.logger = init_logger('wiki_interface', basedir=log_dir)
 
 
     def login(self, creds:Mediawiki_Creds):
@@ -55,7 +59,7 @@ class Wiki:
         assert login_result.json()['login']['result'] == "Success"
         self.sess = sess
 
-    def get_page(self, page:str) -> WikiPage:
+    def get_page(self, page:str) -> Optional[WikiPage]:
 
         content = self.sess.get(
             self.api_url,
@@ -67,19 +71,29 @@ class Wiki:
                 'format':'json'
             }
         ).json()
+
+        if content.get('error', {}).get('code', '') == 'missingtitle':
+            # Page does not exist!
+            self.logger.debug("Page does not exist")
+            return None
+
+        self.logger.debug(f"Got Page content:")
+        self.logger.debug(content)
         return WikiPage.from_source(title=content['parse']['title'], source=content['parse']['wikitext'])
 
     def insert_text(self, page, section, text):
 
         # TODO: Move finding section IDs into the page class!
         page_text = self.get_page(page)
-
-        sections = page_text.content.get_sections()
         matching_section = -1
-        for i, page_section in enumerate(sections):
-            if page_section.title is not None and page_section.title.strip().lower() == section.lower():
-                matching_section = i
-                break
+        if page_text is not None:
+            # find section number
+            sections = page_text.content.get_sections()
+
+            for i, page_section in enumerate(sections):
+                if page_section.title is not None and page_section.title.strip().lower() == section.lower():
+                    matching_section = i
+                    break
 
 
         token = self.sess.get(
@@ -106,7 +120,7 @@ class Wiki:
                 }
             )
         else:
-            print('making new section')
+            self.logger.debug('making new section')
             result = self.sess.post(
                 self.api_url,
                 data={
