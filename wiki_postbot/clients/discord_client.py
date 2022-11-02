@@ -149,7 +149,7 @@ def main():
     discord_creds = Discord_Creds.from_json(directory / 'discord_creds.json')
     wiki_creds = Mediawiki_Creds.from_json(directory / 'mediawiki_creds.json')
 
-    wiki = Wiki(url=args.wiki, log_dir=log_dir)
+    wiki = Wiki(url=args.wiki, log_dir=log_dir, creds=wiki_creds)
     wiki.login(wiki_creds)
 
     client = DiscordClient(wiki=wiki, log_dir=log_dir)

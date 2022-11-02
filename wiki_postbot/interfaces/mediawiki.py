@@ -20,14 +20,16 @@ import pdb
 
 
 class Wiki:
-    def __init__(self, url:str, api_suffix:str="/api.php", index_page="Discord Messages",
+    def __init__(self, url:str, creds:Mediawiki_Creds,
+                 api_suffix:str="/api.php", index_page="Discord Messages",
                  log_dir:Path=Path('/var/www/wikibot')):
         self.url = url
         self.api_url = urljoin(self.url, api_suffix)
+        self.creds = creds
         self.sess = None
         self.index_page = index_page
         self.logger = init_logger('wiki_interface', basedir=log_dir)
-
+        self.login(self.creds)
 
     def login(self, creds:Mediawiki_Creds):
         # get token to log in
@@ -140,6 +142,7 @@ class Wiki:
         Not being precious about this, just implementing
         and will worry about generality later!
         """
+        self.login(self.creds)
         # Get message in mediawiki template formatting
         template_str = TemplateMessage.format_discord(msg)
 
