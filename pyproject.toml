@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wiki-postbot"
-version = "0.1.0"
+version = "0.1.1"
 description = "Add posts to the wiki!"
 authors = ["sneakers-the-rat <JLSaunders987@gmail.com>"]
 license = "GPL-3.0"
