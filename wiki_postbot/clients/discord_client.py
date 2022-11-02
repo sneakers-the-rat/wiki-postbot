@@ -55,7 +55,6 @@ class DiscordClient(Client):
 
     async def on_disconnect(self):
         self.logger.debug(f"wikibot disconnected!")
-        await self.reply_channel.send("Wikibot disconnected!")
 
 
     async def on_message(self, message:discord.message.Message):
