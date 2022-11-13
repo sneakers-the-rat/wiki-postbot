@@ -62,13 +62,17 @@ class NBack:
 
         # combine into matches
         nb_wildcard = caret.suppress() + "*"
+        nb_wildcard.set_name("NBack - Wildcard")
         # start or end can be omitted if comma is present
         nb_full = nb_range + pp.Optional(integer("start")) + comma + pp.Optional(integer("end")) + rcurly
+        nb_full.set_name("NBack - Fully Specified")
         # if no comma present, it's just an end
         nb_end = nb_range + integer("end") + rcurly
+        nb_end.set_name("NBack - End Specified")
 
         # combine into full nback parser
         nback = pp.Group(nb_wildcard('wildcard') | nb_full | nb_end | caret("one")).set_results_name("nback")
+        nback.set_name("NBack Prefix")
         return nback
 
     def __eq__(self, other:'NBack'):
@@ -123,7 +127,7 @@ class Wikilink(Pattern):
 
     def __init__(
             self,
-            link: str,
+            link: Optional[str] = None,
             nback: Optional[Union[NBack, tuple, dict]] = None,
             predicate: Optional[str] = None,
             object: Optional[str] = None,
@@ -160,14 +164,50 @@ class Wikilink(Pattern):
         nback = NBack.make_parser()
 
         # main wikilink subject text
-        link = pp.Word(pp.printables+ " ", excludeChars="#[]{}|")
+        #link = pp.Word(pp.printables+ " ", excludeChars="#[]{}|:") + pp.Optional(pp.Literal(':')) + pp.Optional(pp.Word(pp.printables+ " ", excludeChars="#[]{}|:"))
+        # allow single, but not double colons
+        # "Look for a printable character and an optional colon that isn't a double colon,
+        # combine those. Then look for one or more instances of that, and combine that."
+        link = pp.Combine(
+            pp.OneOrMore(
+                pp.Combine(
+                    pp.Word(pp.printables+ " ", excludeChars="#[]{}|:").set_name("Link Body") + \
+                    pp.Optional(
+                        pp.Literal(':')+ ~pp.Literal(':')
+                    ).set_name('Single Colon')
+                )
+            )
+        )
+        link.set_name("Wikilink - Body")
+
 
         # optional page section
         hash = pp.Literal("#").suppress()
         section = hash + link
+        section.set_name("Section")
+
+        # combined they make a fully qualified link#section link
+        link_full = link("link") + pp.Optional(section("section"))
+        link_full.set_name("Wikilink - Full")
+
+        #### SMW
+        # Predicate::Object with implicit subject
+        smw_delimiter = pp.Literal('::').suppress()
+        implicit_semantic = link("predicate") + smw_delimiter + link("object")
+
+        # or
+        # Link::Predicate::Object with explicit subject
+        explicit_semantic = link_full + smw_delimiter + implicit_semantic
+
+        ### Combine link bodies
+        # optionally matching depending on the form
+        link_bodies = explicit_semantic.set_name('Explicit Semantic Link') | implicit_semantic.set_name('Implicit Semantic Link') | link_full
+        # link_bodies = implicit_semantic
 
         # Combine all
-        parser = lbracket + pp.Optional(nback) + link("link") + pp.Optional(section("section")) + rbracket
+        #parser = lbracket + pp.Optional(nback) + link_full + rbracket
+        parser = lbracket + pp.Optional(nback) + link_bodies + rbracket
+        parser.set_name('Wikilink Parser')
         return parser
 
     @classmethod

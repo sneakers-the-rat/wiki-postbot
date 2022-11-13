@@ -41,6 +41,14 @@ class TestStr:
         "[[^{1,3}Link#With section]]",
         Wikilink("Link", nback=NBack(1,3), section="With section")
     )
+    implicit = (
+        "[[Predicate:singlecol::Object]]",
+        Wikilink(predicate="Predicate:singlecol", object="Object")
+    )
+    explicit = (
+        "[[Link#Section::Predicate:singlecol::Object]]",
+        Wikilink(link="Link", section="Section", predicate="Predicate:singlecol", object="Object")
+    )
 
 
 def pad_garbage(string:str) -> str:
@@ -135,9 +143,15 @@ def test_section(test_string, expected):
     assert len(wl) == 1
     assert wl[0] == expected
 
-
-def test_triplet_full():
-    pass
+@pytest.mark.parametrize(
+    "test_string,expected",
+     [TestStr.implicit, TestStr.explicit])
+def test_triplets(test_string, expected):
+    test_string = pad_garbage(test_string)
+    wl = Wikilink.parse(test_string)
+    # pdb.set_trace()
+    assert len(wl) == 1
+    assert wl[0] == expected
 
 def test_triplet_implicit_single():
     """Test an implicit triplet in a single message"""
